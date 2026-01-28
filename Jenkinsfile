@@ -6,6 +6,7 @@ pipeline {
             steps {
                 sh 'python3 --version'
                 sh 'pip --version'
+                sh `python3 -m venv --help`
             }
         }
 
