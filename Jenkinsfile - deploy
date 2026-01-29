@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'kubernetes-agent' }
+    agent { label 'flask-agent' }
 
     parameters {
         string(name: 'ARTIFACT_NAME', defaultValue: '', description: 'Artifact to deploy')
