@@ -1,0 +1,68 @@
+pipeline {
+    agent { label 'kubernetes-agent' }
+
+    parameters {
+        string(name: 'ARTIFACT_NAME', defaultValue: '', description: 'Artifact to deploy')
+    }
+
+    environment {
+        MINISERVE_URL = "http://192.168.49.1:8888/uploads"
+        VENV_PATH = "/home/jenkins/agent/venv/bin"
+        APP_DIR = "/home/jenkins/agent/app"
+    }
+
+    stages {
+        stage('Download artifact') {
+            steps {
+                sh """
+                # Pobranie artefaktu z miniserve
+                curl -o ${ARTIFACT_NAME} ${MINISERVE_URL}/${ARTIFACT_NAME}
+                """
+            }
+        }
+
+        stage('Prepare application') {
+            steps {
+                sh """
+                # Tworzymy katalog aplikacji
+                rm -rf ${APP_DIR}
+                mkdir -p ${APP_DIR}
+
+                # Rozpakowujemy artefakt
+                tar -xzf ${ARTIFACT_NAME} -C ${APP_DIR}
+                """
+            }
+        }
+
+        stage('Install dependencies') {
+            steps {
+                sh """
+                # Instalacja zależności w venv agenta
+                ${VENV_PATH}/pip install --upgrade pip
+                ${VENV_PATH}/pip install -r ${APP_DIR}/requirements.txt
+                """
+            }
+        }
+
+        stage('Run application') {
+            steps {
+                sh """
+                # Zatrzymanie ewentualnej poprzedniej instancji
+                pkill -f "python ${APP_DIR}/app.py" || true
+
+                # Uruchomienie aplikacji w tle
+                nohup ${VENV_PATH}/python ${APP_DIR}/app.py > ${APP_DIR}/app.log 2>&1 &
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Application deployed successfully!"
+        }
+        failure {
+            echo "Deployment failed!"
+        }
+    }
+}
