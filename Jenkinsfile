@@ -37,5 +37,28 @@ pipeline {
                 '''
             }
         }
+        
+        stage('Package application') {
+            steps {
+                sh '''
+                mkdir -p dist
+                tar -czf dist/app.tar.gz app.py requirements.txt
+                '''
+            }
+        }
+
+        stage('Upload to miniserve') {
+            steps {
+                sh '''
+                curl -X POST -F "file=@dist/app.tar.gz" http://192.168.49.1:8888/upload
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            archiveArtifacts artifacts: 'dist/app.tar.gz'
+        }
     }
 }
