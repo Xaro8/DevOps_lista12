@@ -1,0 +1,21 @@
+# Start from official Jenkins agent base image
+FROM jenkins/inbound-agent:latest
+
+# Switch to root to install Python & dependencies
+USER root
+
+# Install Python 3 and pip
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv
+
+# Create virtual environment and install dependencies
+RUN python3 -m venv /home/jenkins/agent/venv
+COPY requirements.txt /tmp/requirements.txt
+RUN /home/jenkins/agent/venv/bin/pip install --upgrade pip && \
+    /home/jenkins/agent/venv/bin/pip install -r /tmp/requirements.txt
+
+# Set working directory
+WORKDIR /home/jenkins/agent
+
+# Switch back to jenkins user
+USER jenkins
