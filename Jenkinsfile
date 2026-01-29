@@ -50,7 +50,9 @@ pipeline {
         stage('Upload to miniserve') {
             steps {
                 sh '''
-                curl -X POST -F "file=@dist/app.tar.gz" http://192.168.49.1:8888/upload
+                curl -X PUT \
+                    --upload-file dist/app.tar.gz \
+                    http://host.docker.internal:8888/app.tar.gz
                 '''
             }
         }
