@@ -50,7 +50,7 @@ pipeline {
         stage('Upload to miniserve') {
             steps {
                 sh '''
-                curl -F "path=@dist/app.tar.gz" http://localhost:8888/upload?path=/uploads/
+                curl -F "path=@dist/app.tar.gz" http://192.168.49.1:8888/upload?path=/uploads/
                 '''
             }
         }
