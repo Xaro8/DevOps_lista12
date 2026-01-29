@@ -59,6 +59,13 @@ pipeline {
     post {
         success {
             archiveArtifacts artifacts: 'dist/app.tar.gz'
+            
+            // Trigger deploy pipeline i przekazanie artefaktu
+            build job: 'lista12_deploy',
+                parameters: [
+                    string(name: 'ARTIFACT_NAME', value: 'app.tar.gz')
+                ],
+                wait: false
         }
     }
 }
