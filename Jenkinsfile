@@ -52,7 +52,7 @@ pipeline {
                 sh '''
                 curl -X PUT \
                     --upload-file dist/app.tar.gz \
-                    http://host.docker.internal:8888/app.tar.gz
+                    http://192.168.49.1:8888/app.tar.gz
                 '''
             }
         }
