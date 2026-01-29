@@ -47,11 +47,10 @@ pipeline {
         stage('Run application') {
             steps {
                 sh """
-                # Zatrzymanie ewentualnej poprzedniej instancji
-                pkill -f "python ${APP_DIR}/app.py" || true
+                pkill -f app.py || true
 
-                # Uruchomienie aplikacji w tle
-                nohup ${VENV_PATH}/python ${APP_DIR}/app.py > ${APP_DIR}/app.log 2>&1 &
+                setsid ${VENV_PATH}/python ${APP_DIR}/app.py \
+                > ${APP_DIR}/app.log 2>&1 < /dev/null &
                 """
             }
         }
